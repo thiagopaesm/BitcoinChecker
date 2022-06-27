@@ -7,6 +7,8 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
 
@@ -29,7 +31,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.observers.DisposableCompletableObserver;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
-import io.realm.Realm;
 
 public class NotificationBroadcast extends BroadcastReceiver {
     @Override
@@ -58,12 +59,12 @@ public class NotificationBroadcast extends BroadcastReceiver {
                             if (c.getTypeCoin() == coinModel.getTypeCoin()) {
                                 double priceNew = Double.parseDouble(coinModel.getPrice());
                                 double priceOld = Double.parseDouble(c.getPrice());
-                                double percent = (priceNew - priceOld) / 100.0;
+                                float percent = (float) (((priceNew - priceOld) / priceOld) * 100);
                                 c.setPercent(String.valueOf(percent));
                             } else if (c.getTypeCoin() == coinModel2.getTypeCoin()) {
                                 double priceNew = Double.parseDouble(coinModel.getPrice());
                                 double priceOld = Double.parseDouble(c.getPrice());
-                                double percent = (priceNew - priceOld) / 100.0;
+                                float percent = (float) (((priceNew - priceOld) / priceOld) * 100);
                                 c.setPercent(String.valueOf(percent));
                             }
                         }
@@ -75,20 +76,17 @@ public class NotificationBroadcast extends BroadcastReceiver {
                 .subscribe(new DisposableSingleObserver<ArrayList<CoinModel>>() {
                     @Override
                     public void onSuccess(@NonNull ArrayList<CoinModel> coinModels) {
-                        RealmCompletableObservable.create(new RealmCompletableObservable.OnConsumerListener() {
-                            @Override
-                            public void onConsumer(Realm realm) {
-                                ArrayList<CoinForRealm> list = new ArrayList<>();
-                                for (CoinModel c : coinModels) {
-                                    list.add(new CoinForRealm(c.getId(),
-                                            c.getPrice(),
-                                            c.getTypeCoin().toString(),
-                                            c.getSymbol(),
-                                            c.getPercent(),
-                                            c.isAlarm()));
-                                }
-                                realm.copyToRealmOrUpdate(list);
+                        RealmCompletableObservable.create(realm -> {
+                            ArrayList<CoinForRealm> list = new ArrayList<>();
+                            for (CoinModel c : coinModels) {
+                                list.add(new CoinForRealm(c.getId(),
+                                        c.getPrice(),
+                                        c.getTypeCoin().toString(),
+                                        c.getSymbol(),
+                                        c.getPercent(),
+                                        c.isAlarm()));
                             }
+                            realm.copyToRealmOrUpdate(list);
                         }).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
                                 .subscribe(new DisposableCompletableObserver() {
                                     @Override
@@ -98,15 +96,17 @@ public class NotificationBroadcast extends BroadcastReceiver {
                                                 .subscribe(new DisposableSingleObserver<ArrayList<CoinModel>>() {
                                                     @Override
                                                     public void onSuccess(@NonNull ArrayList<CoinModel> coinModels) {
-                                                        // Update UI
                                                         String price = "";
-                                                        for (CoinModel c: coinModels) {
+                                                        boolean isSound = false;
+                                                        for (CoinModel c : coinModels) {
                                                             if (c.getTypeCoin() == TypeCoin.BTCUSDT) {
                                                                 price = c.getPrice();
+                                                                isSound = (Double.parseDouble(c.getPercent()) >= -200 || Double.parseDouble(c.getPercent()) <=999 );
                                                                 break;
                                                             }
                                                         }
-                                                        createNotifyTempSave(context, price);
+                                                        Log.e("TAG", "Notification");
+                                                        createNotifyTempSave(context, price, isSound);
                                                     }
 
                                                     @Override
@@ -146,7 +146,8 @@ public class NotificationBroadcast extends BroadcastReceiver {
         });
     }
 
-    private void createNotifyTempSave(Context context, String price) {
+    private void createNotifyTempSave(Context context, String price, boolean hasSound) {
+        Preference preference = new Preference(context);
         Intent notificationIntent = new Intent(context, MainActivity.class);
         PendingIntent contentIntent = PendingIntent.getActivity(
                 context,
@@ -158,8 +159,8 @@ public class NotificationBroadcast extends BroadcastReceiver {
                     (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             String CHANNEL_ID = "Coin"; // The id of the channel.
             String name = "Notification";// The user-visible name of the channel.
-            int importance = NotificationManager.IMPORTANCE_HIGH;
-            NotificationChannel mChannel = new NotificationChannel(CHANNEL_ID, name, importance);
+            int importance = hasSound ? NotificationManager.IMPORTANCE_HIGH : NotificationManager.IMPORTANCE_LOW;
+            NotificationChannel mChannel = new NotificationChannel(CHANNEL_ID, name, NotificationManager.IMPORTANCE_LOW);
             Notification notification =
                     new Notification.Builder(context)
                             .setContentIntent(contentIntent)
@@ -175,13 +176,33 @@ public class NotificationBroadcast extends BroadcastReceiver {
             notification
                     .setContentIntent(contentIntent)
                     .setDefaults(Notification.DEFAULT_ALL)
-                    .setContentText("BTC")
+                    .setSmallIcon(R.drawable.ic_launcher_background)
+                    .setContentText("BTC : " + price)
                     .setAutoCancel(true)
                     .build();
 
             NotificationManager notificationManager =
                     (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.notify(1, notification.build());
+        }
+
+        if (hasSound) {
+                if (preference.getUriSound() != null) {
+                    audioPlayer(context, preference.getUriSound());
+                }
+            }
+    }
+
+    public void audioPlayer(Context context, Uri uri) {
+        //set up MediaPlayer
+        MediaPlayer mp = new MediaPlayer();
+
+        try {
+            mp.setDataSource(context, uri);
+            mp.prepare();
+            mp.start();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

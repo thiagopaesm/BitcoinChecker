@@ -10,13 +10,18 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.recyclerview.widget.RecyclerView;
@@ -43,19 +48,33 @@ import io.realm.Realm;
 public class MainActivity extends AppCompatActivity implements AdapterCoin.OnSwitchAlarmListener {
     private RecyclerView recyclerView;
     private AdapterCoin adapterCoin;
+    private Button btn;
     private Handler handler;
+    private Preference preference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         recyclerView = findViewById(R.id.rcv);
+        btn = findViewById(R.id.btnSetting);
         adapterCoin = new AdapterCoin(this);
         recyclerView.setAdapter(adapterCoin);
         handler = new Handler(Looper.getMainLooper());
+        preference = new Preference(this);
         handler.postDelayed(runnable, MINUTE_TEST);
-        Constant.startAlarm(ID_ALARM_BIT_COIN, this);
         updateData();
+
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent;
+                intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                intent.setType("audio/mpeg");
+                startActivityForResult(Intent.createChooser(intent, "Select audio for notification"), 1);
+            }
+        });
     }
 
     private Runnable runnable = new Runnable() {
@@ -88,11 +107,14 @@ public class MainActivity extends AppCompatActivity implements AdapterCoin.OnSwi
                                 double priceNew = Double.parseDouble(coinModel.getPrice());
                                 double priceOld = Double.parseDouble(c.getPrice());
                                 float percent = (float) (((priceNew - priceOld) / priceOld) * 100);
+                                c.setPrice(coinModel.getPrice());
+                                //if(percent > Constant.sensi_percent || percent < -Constant.sensi_percent)
                                 c.setPercent(String.valueOf(percent));
                             } else if (c.getTypeCoin() == coinModel2.getTypeCoin()) {
                                 double priceNew = Double.parseDouble(coinModel.getPrice());
                                 double priceOld = Double.parseDouble(c.getPrice());
                                 float percent = (float) (((priceNew - priceOld) / priceOld) * 100);
+
                                 c.setPercent(String.valueOf(percent));
                             }
                         }
@@ -109,6 +131,7 @@ public class MainActivity extends AppCompatActivity implements AdapterCoin.OnSwi
                             public void onConsumer(Realm realm) {
                                 ArrayList<CoinForRealm> list = new ArrayList<>();
                                 for (CoinModel c : coinModels) {
+                                    Log.i("Script","APPBitcoinChecker debug1");
                                     list.add(new CoinForRealm(c.getId(),
                                             c.getPrice(),
                                             c.getTypeCoin().toString(),
@@ -158,6 +181,7 @@ public class MainActivity extends AppCompatActivity implements AdapterCoin.OnSwi
             List<CoinForRealm> list = realm.where(CoinForRealm.class).findAll();
             ArrayList<CoinModel> lis = new ArrayList<>();
             for (CoinForRealm c : list) {
+                Log.i("Script","APPBitcoinChecker debug2");
                 lis.add(new CoinModel(c.getId(),
                         c.getSymbol(),
                         c.getPrice(),
@@ -219,7 +243,7 @@ public class MainActivity extends AppCompatActivity implements AdapterCoin.OnSwi
                 coinModel.getTypeCoin().toString(),
                 coinModel.getPercent(),
                 coinModel.isAlarm()))).subscribeOn(Schedulers.newThread())
-        .observeOn(AndroidSchedulers.mainThread()).subscribe(new DisposableCompletableObserver() {
+                .observeOn(AndroidSchedulers.mainThread()).subscribe(new DisposableCompletableObserver() {
             @Override
             public void onComplete() {
                 int id = coinModel.getTypeCoin() == TypeCoin.BTCUSDT ? ID_ALARM_BIT_COIN : ID_ALARM_XMR;
@@ -238,4 +262,20 @@ public class MainActivity extends AppCompatActivity implements AdapterCoin.OnSwi
         });
 
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            if (requestCode == 1) {
+                if ((data != null) && (data.getData() != null)) {
+                    Uri audioFileUri = data.getData();
+                    preference.saveUriSound(audioFileUri);
+                } else {
+                    Toast.makeText(this, "Can't select file", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+}
+
 }

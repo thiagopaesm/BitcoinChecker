@@ -6,10 +6,11 @@ import android.content.Context;
 import android.content.Intent;
 
 public class Constant {
-    public static long MINUTE = 1 * 60 * 1000;
-    public static long MINUTE_TEST = 1 * 60 * 1000;
+    public static long MINUTE = 5 * 60 * 1000;
+    public static long MINUTE_TEST = 2000;//5 * 60 * 1000;
     public static int ID_ALARM_BIT_COIN = 1;
     public static int ID_ALARM_XMR = 2;
+    public static double sensi_percent = 1;
 
 
     public static void startAlarm(int idAlarm, Context context) {

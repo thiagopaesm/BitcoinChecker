@@ -9,7 +9,20 @@
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:id="@+id/rcv"
+        app:layout_constraintTop_toTopOf="parent"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        android:layout_height="match_parent" />
+        android:paddingBottom="20dp"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="20dp"
+        android:text="Setting sound notification"
+        android:textAllCaps="false"
+        android:id="@+id/btnSetting"
+        app:layout_constraintTop_toBottomOf="@+id/rcv" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
