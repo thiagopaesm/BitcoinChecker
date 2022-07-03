@@ -101,7 +101,7 @@ public class NotificationBroadcast extends BroadcastReceiver {
                                                         for (CoinModel c : coinModels) {
                                                             if (c.getTypeCoin() == TypeCoin.BTCUSDT) {
                                                                 price = c.getPrice();
-                                                                isSound = (Double.parseDouble(c.getPercent()) >= -200 || Double.parseDouble(c.getPercent()) <=999 );
+                                                                isSound = Double.parseDouble(c.getPercent()) >= 10.0;
                                                                 break;
                                                             }
                                                         }

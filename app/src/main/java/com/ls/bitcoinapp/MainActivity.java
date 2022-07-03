@@ -107,14 +107,11 @@ public class MainActivity extends AppCompatActivity implements AdapterCoin.OnSwi
                                 double priceNew = Double.parseDouble(coinModel.getPrice());
                                 double priceOld = Double.parseDouble(c.getPrice());
                                 float percent = (float) (((priceNew - priceOld) / priceOld) * 100);
-                                c.setPrice(coinModel.getPrice());
-                                //if(percent > Constant.sensi_percent || percent < -Constant.sensi_percent)
                                 c.setPercent(String.valueOf(percent));
                             } else if (c.getTypeCoin() == coinModel2.getTypeCoin()) {
                                 double priceNew = Double.parseDouble(coinModel.getPrice());
                                 double priceOld = Double.parseDouble(c.getPrice());
                                 float percent = (float) (((priceNew - priceOld) / priceOld) * 100);
-
                                 c.setPercent(String.valueOf(percent));
                             }
                         }
@@ -131,7 +128,6 @@ public class MainActivity extends AppCompatActivity implements AdapterCoin.OnSwi
                             public void onConsumer(Realm realm) {
                                 ArrayList<CoinForRealm> list = new ArrayList<>();
                                 for (CoinModel c : coinModels) {
-                                    Log.i("Script","APPBitcoinChecker debug1");
                                     list.add(new CoinForRealm(c.getId(),
                                             c.getPrice(),
                                             c.getTypeCoin().toString(),
@@ -181,7 +177,6 @@ public class MainActivity extends AppCompatActivity implements AdapterCoin.OnSwi
             List<CoinForRealm> list = realm.where(CoinForRealm.class).findAll();
             ArrayList<CoinModel> lis = new ArrayList<>();
             for (CoinForRealm c : list) {
-                Log.i("Script","APPBitcoinChecker debug2");
                 lis.add(new CoinModel(c.getId(),
                         c.getSymbol(),
                         c.getPrice(),

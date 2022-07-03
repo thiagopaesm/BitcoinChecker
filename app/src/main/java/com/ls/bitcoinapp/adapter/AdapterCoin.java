@@ -1,6 +1,5 @@
 package com.ls.bitcoinapp.adapter;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,7 +39,6 @@ public class AdapterCoin extends RecyclerView.Adapter<AdapterCoin.CoinHolder> {
     public void onBindViewHolder(@NonNull CoinHolder holder, int position) {
         CoinModel c = list.get(position);
         holder.txtName.setText(c.getTypeCoin().toString());
-        Log.i("Script","Debug3 "+c.getPrice()+" - "+c.getPercent()+" "+c.getSymbol());
         holder.imgSwitch.setImageResource(c.isAlarm() ? R.drawable.ic_switch_on : R.drawable.ic_switch_off);
         if (c.getPercent() != null) {
             String percent = Double.parseDouble(c.getPercent()) < 0 ? c.getPercent() : "+" + c.getPercent();
