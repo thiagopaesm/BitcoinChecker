@@ -42,18 +42,23 @@ public class NotificationBroadcast extends BroadcastReceiver {
         Single.zip(
                 Network.network.getCoin("BTCUSDT"),
                 Network.network.getCoin("XMRBTC"),
+                Network.network.getCoin("ETHBTC"),
                 getListCoinRealm(),
-                (coinModel, coinModel2, coinModels) -> {
+                (coinModel, coinModel2, coinModel3, coinModels) -> {
                     coinModel.setTypeCoin(TypeCoin.BTCUSDT);
                     coinModel2.setTypeCoin(TypeCoin.XMRBTC);
+                    coinModel3.setTypeCoin(TypeCoin.ETHBTC);
                     ArrayList<CoinModel> list = new ArrayList<>();
                     if (coinModels.isEmpty()) {
                         coinModel.setId(UUID.randomUUID().toString());
                         coinModel2.setId(UUID.randomUUID().toString());
+                        coinModel3.setId(UUID.randomUUID().toString());
                         coinModel.setAlarm(false);
                         coinModel2.setAlarm(false);
+                        coinModel3.setAlarm(false);
                         list.add(coinModel);
                         list.add(coinModel2);
+                        list.add(coinModel3);
                     } else {
                         for (CoinModel c : coinModels) {
                             if (c.getTypeCoin() == coinModel.getTypeCoin()) {
@@ -66,7 +71,13 @@ public class NotificationBroadcast extends BroadcastReceiver {
                                 double priceOld = Double.parseDouble(c.getPrice());
                                 float percent = (float) (((priceNew - priceOld) / priceOld) * 100);
                                 c.setPercent(String.valueOf(percent));
+                            } else if (c.getTypeCoin() == coinModel3.getTypeCoin()) {
+                                double priceNew = Double.parseDouble(coinModel.getPrice());
+                                double priceOld = Double.parseDouble(c.getPrice());
+                                float percent = (float) (((priceNew - priceOld) / priceOld) * 100);
+                                c.setPercent(String.valueOf(percent));
                             }
+
                         }
                         list.addAll(coinModels);
                     }

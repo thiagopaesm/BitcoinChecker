@@ -31,6 +31,7 @@ import com.ls.bitcoinapp.model.CoinForRealm;
 import com.ls.bitcoinapp.model.CoinModel;
 import com.ls.bitcoinapp.model.TypeCoin;
 import com.ls.bitcoinapp.network.Network;
+import com.ls.bitcoinapp.realm.Funcoes_Util;
 import com.ls.bitcoinapp.realm.RealmCompletableObservable;
 import com.ls.bitcoinapp.realm.RealmSingleObservable;
 
@@ -81,6 +82,7 @@ public class MainActivity extends AppCompatActivity implements AdapterCoin.OnSwi
         @Override
         public void run() {
             updateData();
+            Log.i("Script", "GetCoin");
             handler.postDelayed(this, MINUTE_TEST);
         }
     };
@@ -89,29 +91,43 @@ public class MainActivity extends AppCompatActivity implements AdapterCoin.OnSwi
         Single.zip(
                 Network.network.getCoin("BTCUSDT"),
                 Network.network.getCoin("XMRBTC"),
+                Network.network.getCoin("ETHBTC"),
                 getListCoinRealm(),
-                (coinModel, coinModel2, coinModels) -> {
+                (coinModel, coinModel2,coinModel3, coinModels) -> {
                     coinModel.setTypeCoin(TypeCoin.BTCUSDT);
                     coinModel2.setTypeCoin(TypeCoin.XMRBTC);
+                    coinModel3.setTypeCoin(TypeCoin.ETHBTC);
                     ArrayList<CoinModel> list = new ArrayList<>();
                     if (coinModels.isEmpty()) {
+                        Log.i("Script", "CoinModels is empty");
                         coinModel.setId(UUID.randomUUID().toString());
                         coinModel2.setId(UUID.randomUUID().toString());
+                        coinModel3.setId(UUID.randomUUID().toString());
                         coinModel.setAlarm(false);
                         coinModel2.setAlarm(false);
+                        coinModel3.setAlarm(false);
                         list.add(coinModel);
                         list.add(coinModel2);
+                        list.add(coinModel3);
                     } else {
                         for (CoinModel c : coinModels) {
                             if (c.getTypeCoin() == coinModel.getTypeCoin()) {
                                 double priceNew = Double.parseDouble(coinModel.getPrice());
                                 double priceOld = Double.parseDouble(c.getPrice());
                                 float percent = (float) (((priceNew - priceOld) / priceOld) * 100);
+                                percent = Funcoes_Util.MathRound2decimal(percent);
                                 c.setPercent(String.valueOf(percent));
                             } else if (c.getTypeCoin() == coinModel2.getTypeCoin()) {
-                                double priceNew = Double.parseDouble(coinModel.getPrice());
+                                double priceNew = Double.parseDouble(coinModel2.getPrice());
                                 double priceOld = Double.parseDouble(c.getPrice());
                                 float percent = (float) (((priceNew - priceOld) / priceOld) * 100);
+                                percent = Funcoes_Util.MathRound2decimal(percent);
+                                c.setPercent(String.valueOf(percent));
+                            } else if (c.getTypeCoin() == coinModel3.getTypeCoin()) {
+                                double priceNew = Double.parseDouble(coinModel3.getPrice());
+                                double priceOld = Double.parseDouble(c.getPrice());
+                                float percent = (float) (((priceNew - priceOld) / priceOld) * 100);
+                                percent = Funcoes_Util.MathRound2decimal(percent);
                                 c.setPercent(String.valueOf(percent));
                             }
                         }
