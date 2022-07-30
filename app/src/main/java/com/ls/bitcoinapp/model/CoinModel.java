@@ -4,9 +4,18 @@ public class CoinModel {
     private String id;
     private String symbol;
     private String price;
+    private String priceShow;
     private TypeCoin typeCoin;
     String percent;
     private boolean isAlarm;
+
+    public String getPriceShow() {
+        return priceShow;
+    }
+
+    public void setPriceShow(String priceShow) {
+        this.priceShow = priceShow;
+    }
 
     public boolean isAlarm() {
         return isAlarm;
@@ -58,11 +67,12 @@ public class CoinModel {
         this.price = price;
     }
 
-    public CoinModel(String id, String symbol, String price, TypeCoin typeCode, String percent, boolean isAlarm) {
+    public CoinModel(String id, String symbol, String price, String priceShow, TypeCoin typeCode, String percent, boolean isAlarm) {
         this.id = id;
         this.percent = percent;
         this.symbol = symbol;
         this.price = price;
+        this.priceShow = priceShow;
         this.typeCoin = typeCode;
         this.isAlarm = isAlarm;
     }

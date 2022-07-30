@@ -92,6 +92,7 @@ public class NotificationBroadcast extends BroadcastReceiver {
                             for (CoinModel c : coinModels) {
                                 list.add(new CoinForRealm(c.getId(),
                                         c.getPrice(),
+                                        c.getPriceShow(),
                                         c.getTypeCoin().toString(),
                                         c.getSymbol(),
                                         c.getPercent(),
@@ -149,6 +150,7 @@ public class NotificationBroadcast extends BroadcastReceiver {
                 lis.add(new CoinModel(c.getId(),
                         c.getSymbol(),
                         c.getPrice(),
+                        c.getPriceShow(),
                         TypeCoin.valueOf(c.getType()),
                         c.getPercent(),
                         c.isAlarm()));

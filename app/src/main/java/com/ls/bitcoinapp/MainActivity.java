@@ -113,18 +113,21 @@ public class MainActivity extends AppCompatActivity implements AdapterCoin.OnSwi
                         for (CoinModel c : coinModels) {
                             if (c.getTypeCoin() == coinModel.getTypeCoin()) {
                                 double priceNew = Double.parseDouble(coinModel.getPrice());
+                                c.setPriceShow(coinModel.getPrice());
                                 double priceOld = Double.parseDouble(c.getPrice());
                                 float percent = (float) (((priceNew - priceOld) / priceOld) * 100);
                                 percent = Funcoes_Util.MathRound2decimal(percent);
                                 c.setPercent(String.valueOf(percent));
                             } else if (c.getTypeCoin() == coinModel2.getTypeCoin()) {
                                 double priceNew = Double.parseDouble(coinModel2.getPrice());
+                                c.setPriceShow(coinModel2.getPrice());
                                 double priceOld = Double.parseDouble(c.getPrice());
                                 float percent = (float) (((priceNew - priceOld) / priceOld) * 100);
                                 percent = Funcoes_Util.MathRound2decimal(percent);
                                 c.setPercent(String.valueOf(percent));
                             } else if (c.getTypeCoin() == coinModel3.getTypeCoin()) {
                                 double priceNew = Double.parseDouble(coinModel3.getPrice());
+                                c.setPriceShow(coinModel3.getPrice());
                                 double priceOld = Double.parseDouble(c.getPrice());
                                 float percent = (float) (((priceNew - priceOld) / priceOld) * 100);
                                 percent = Funcoes_Util.MathRound2decimal(percent);
@@ -146,6 +149,8 @@ public class MainActivity extends AppCompatActivity implements AdapterCoin.OnSwi
                                 for (CoinModel c : coinModels) {
                                     list.add(new CoinForRealm(c.getId(),
                                             c.getPrice(),
+                                            c.getPriceShow(),
+
                                             c.getTypeCoin().toString(),
                                             c.getSymbol(),
                                             c.getPercent(),
@@ -183,7 +188,7 @@ public class MainActivity extends AppCompatActivity implements AdapterCoin.OnSwi
 
                     @Override
                     public void onError(@NonNull Throwable e) {
-                        Log.e("TAG", "Zip error");
+                        Log.e("TAG", "Zip error "+e.getMessage().toString());
                     }
                 });
     }
@@ -196,6 +201,7 @@ public class MainActivity extends AppCompatActivity implements AdapterCoin.OnSwi
                 lis.add(new CoinModel(c.getId(),
                         c.getSymbol(),
                         c.getPrice(),
+                        c.getPriceShow(),
                         TypeCoin.valueOf(c.getType()),
                         c.getPercent(),
                         c.isAlarm()));
@@ -250,6 +256,7 @@ public class MainActivity extends AppCompatActivity implements AdapterCoin.OnSwi
 
         RealmCompletableObservable.create(realm -> realm.insertOrUpdate(new CoinForRealm(coinModel.getId(),
                 coinModel.getPrice(),
+                coinModel.getPriceShow(),
                 coinModel.getSymbol(),
                 coinModel.getTypeCoin().toString(),
                 coinModel.getPercent(),

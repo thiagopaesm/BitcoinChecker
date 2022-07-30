@@ -9,10 +9,20 @@ public class CoinForRealm extends RealmObject {
     @PrimaryKey
     private String id;
     private String price;
+    private String priceShow;
     private String type;
     private String symbol;
     private String percent;
     private boolean isAlarm;
+
+
+    public String getPriceShow() {
+        return priceShow;
+    }
+
+    public void setPriceShow(String priceShow) {
+        this.priceShow = priceShow;
+    }
 
     public boolean isAlarm() {
         return isAlarm;
@@ -62,10 +72,11 @@ public class CoinForRealm extends RealmObject {
         this.type = type;
     }
 
-    public CoinForRealm(String id, String price, String type, String symbol, String percnet, boolean isAlarm) {
+    public CoinForRealm(String id, String price, String priceShow, String type, String symbol, String percnet, boolean isAlarm) {
         this.id = id;
         this.percent = percnet;
         this.price = price;
+        this.priceShow = priceShow;
         this.type = type;
         this.symbol = symbol;
         this.isAlarm = isAlarm;

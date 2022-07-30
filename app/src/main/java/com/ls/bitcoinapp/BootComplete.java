@@ -35,6 +35,7 @@ public class BootComplete extends BroadcastReceiver {
                 lis.add(new CoinModel(c.getId(),
                         c.getSymbol(),
                         c.getPrice(),
+                        c.getPriceShow(),
                         TypeCoin.valueOf(c.getType()),
                         c.getPercent(),
                         c.isAlarm()));

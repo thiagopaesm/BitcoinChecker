@@ -46,7 +46,7 @@ public class AdapterCoin extends RecyclerView.Adapter<AdapterCoin.CoinHolder> {
         } else {
             holder.txtPercent.setText("0%");
         }
-        holder.txtPrice.setText(c.getPrice());
+        holder.txtPrice.setText(c.getPriceShow());
         holder.imgSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
